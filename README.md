@@ -1,6 +1,6 @@
 # Clothify.Ai 🌸✨: Where AI Meets Desi Style
 
-**Live Demo:** [https://aiclothify.vercel.app/](https://aiclothify.vercel.app/)
+**Live Demo:** https://clothify-q81u.onrender.com
 
 **Your AI Companion:** **Taara** – Your fashion-forward, skincare-savvy digital bestie with a desi twist! 🇮🇳
 
@@ -84,7 +84,7 @@ I’m always excited to:
 
 **Reach out:**
 
-- 🌐 Visit our [website](https://aiclothify.vercel.app/)
+- 🌐 Visit our [website]((https://clothify-q81u.onrender.com/login))
 - 📧 Use the in-app contact form
 - 🐛 Report issues and suggest features
 
