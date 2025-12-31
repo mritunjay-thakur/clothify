@@ -1,0 +1,203 @@
+import { axiosInstance } from "./axios";
+
+export const signup = async (signupData) => {
+  try {
+    const response = await axiosInstance.post("/auth/signup", signupData);
+    return response.data;
+  } catch (err) {
+    throw new Error(
+      err?.response?.status === 429
+        ? err?.response?.data?.message ||
+          `Too many requests, please try again after ${
+            err.response.headers["retry-after"] || 30
+          } seconds.`
+        : err?.response?.data?.message || "Signup failed."
+    );
+  }
+};
+
+export const login = async (loginData) => {
+  try {
+    const response = await axiosInstance.post("/auth/login", loginData);
+    return response.data;
+  } catch (err) {
+    throw new Error(
+      err?.response?.status === 429
+        ? err?.response?.data?.message ||
+          `Too many requests, please try again after ${
+            err.response.headers["retry-after"] || 30
+          } seconds.`
+        : err?.response?.data?.message || "Login failed."
+    );
+  }
+};
+
+export const getAuthStatus = async () => {
+  try {
+    const res = await axiosInstance.get("/auth/me");
+    return { isAuthenticated: !!res.data?.user, user: res.data?.user || null };
+  } catch {
+    return { isAuthenticated: false, user: null };
+  }
+};
+
+export const getAuthUser = async () => {
+  try {
+    const res = await axiosInstance.get("/auth/me");
+    return res.data;
+  } catch (error) {
+    if (error.response?.status === 429) {
+      throw new Error(
+        error.response?.data?.message ||
+          `Too many requests, please try again after ${
+            error.response.headers["retry-after"] || 30
+          } seconds.`
+      );
+    }
+    throw error;
+  }
+};
+
+export const logout = async () => {
+  try {
+    const res = await axiosInstance.post("/auth/logout");
+
+    document.cookie =
+      "jwt=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=None; Secure";
+
+    return res.data;
+  } catch (error) {
+    if (process.env.NODE_ENV !== "production") {
+      console.warn("Logout failed:", error);
+    }
+    throw error;
+  }
+};
+
+export const editProfile = async (userData) => {
+  try {
+    const response = await axiosInstance.put("/auth/profile", userData);
+    return response.data;
+  } catch (err) {
+    const serverMessage = err.response?.data?.message;
+    if (err.response?.status === 429) {
+      throw new Error(
+        serverMessage ||
+          `Too many requests. Please try again after ${
+            err.response.headers["retry-after"] || 30
+          } seconds.`
+      );
+    }
+    throw new Error(serverMessage || "Profile update failed.");
+  }
+};
+
+export const resetPassword = async (data) => {
+  try {
+    const response = await axiosInstance.post("/auth/reset-password", data);
+    return response.data;
+  } catch (err) {
+    let errorMessage = err?.response?.data?.message || "Reset password failed.";
+
+    if (err?.response?.status === 404) errorMessage = "User not found.";
+    if (err?.response?.status === 429) {
+      errorMessage =
+        err?.response?.data?.message ||
+        `Too many requests, please try again after ${
+          err.response.headers["retry-after"] || 30
+        } seconds.`;
+    }
+
+    throw new Error(errorMessage);
+  }
+};
+
+export const askClothifyAI = async (messages) => {
+  try {
+    const res = await axiosInstance.post("/ai/clothify", { messages });
+    return res.data;
+  } catch (err) {
+    throw new Error(
+      err?.response?.status === 429
+        ? err?.response?.data?.message ||
+          `Too many requests, please try again after ${
+            err.response.headers["retry-after"] || 30
+          } seconds.`
+        : err?.response?.data?.message || "AI request failed."
+    );
+  }
+};
+
+export const getUserChats = async () => {
+  try {
+    const res = await axiosInstance.get("/chats/");
+    return res.data;
+  } catch (err) {
+    throw new Error(err?.response?.data?.message || "Failed to fetch chats.");
+  }
+};
+
+export const getUserConversations = async () => {
+  try {
+    const res = await axiosInstance.get("/conversations");
+    return res.data;
+  } catch (err) {
+    throw new Error(
+      err?.response?.data?.message || "Failed to fetch conversations."
+    );
+  }
+};
+
+export const createConversation = async (initialMessage) => {
+  try {
+    const res = await axiosInstance.post("/conversations", { initialMessage });
+    return res.data;
+  } catch (err) {
+    throw new Error(
+      err?.response?.data?.message || "Failed to create conversation."
+    );
+  }
+};
+
+export const addMessageToConversation = async (conversationId, message) => {
+  try {
+    const res = await axiosInstance.post(
+      `/conversations/${conversationId}/messages`,
+      { message }
+    );
+    return res.data;
+  } catch (err) {
+    throw new Error(err?.response?.data?.message || "Failed to add message.");
+  }
+};
+
+export const getConversationById = async (conversationId) => {
+  try {
+    const res = await axiosInstance.get(`/conversations/${conversationId}`);
+    return res.data;
+  } catch (err) {
+    throw new Error(
+      err?.response?.data?.message || "Failed to fetch conversation."
+    );
+  }
+};
+
+export const deleteConversation = async (conversationId) => {
+  try {
+    const res = await axiosInstance.delete(`/conversations/${conversationId}`);
+    return res.data;
+  } catch (err) {
+    throw new Error(
+      err?.response?.data?.message || "Failed to delete conversation."
+    );
+  }
+};
+
+export const sendSupportMessage = async (data) => {
+  try {
+    const response = await axiosInstance.post("/message", data);
+    return response.data;
+  } catch (err) {
+    throw new Error(err?.response?.data?.message || "Support message failed.");
+  }
+};
